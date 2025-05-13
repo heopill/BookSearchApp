@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BBA6DFF02DD2126900918530 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = BBA6DFEF2DD2126900918530 /* SnapKit */; };
+		BBFDBABE2DD34FAE00F1CD33 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = BBFDBABD2DD34FAE00F1CD33 /* Alamofire */; };
+		BBFDBAC12DD34FC800F1CD33 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BBFDBAC02DD34FC800F1CD33 /* RxSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		BBA6DFC22DD20B4B00918530 /* BookSearchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookSearchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +42,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBFDBAC12DD34FC800F1CD33 /* RxSwift in Frameworks */,
+				BBA6DFF02DD2126900918530 /* SnapKit in Frameworks */,
+				BBFDBABE2DD34FAE00F1CD33 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +87,9 @@
 			);
 			name = BookSearchApp;
 			packageProductDependencies = (
+				BBA6DFEF2DD2126900918530 /* SnapKit */,
+				BBFDBABD2DD34FAE00F1CD33 /* Alamofire */,
+				BBFDBAC02DD34FC800F1CD33 /* RxSwift */,
 			);
 			productName = BookSearchApp;
 			productReference = BBA6DFC22DD20B4B00918530 /* BookSearchApp.app */;
@@ -107,6 +119,11 @@
 			);
 			mainGroup = BBA6DFB92DD20B4B00918530;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BBA6DFEE2DD2126900918530 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				BBFDBABC2DD34FAE00F1CD33 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				BBFDBABF2DD34FC800F1CD33 /* XCRemoteSwiftPackageReference "RxSwift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BBA6DFC32DD20B4B00918530 /* Products */;
 			projectDirPath = "";
@@ -331,6 +348,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BBA6DFEE2DD2126900918530 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		BBFDBABC2DD34FAE00F1CD33 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+		BBFDBABF2DD34FC800F1CD33 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BBA6DFEF2DD2126900918530 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBA6DFEE2DD2126900918530 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		BBFDBABD2DD34FAE00F1CD33 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBFDBABC2DD34FAE00F1CD33 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		BBFDBAC02DD34FC800F1CD33 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBFDBABF2DD34FC800F1CD33 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BBA6DFBA2DD20B4B00918530 /* Project object */;
 }
