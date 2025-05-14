@@ -52,8 +52,8 @@ class ModalViewController: UIViewController {
         button.setTitle("X", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .lightGray
-        button.layer.cornerRadius = 8
-        button.titleLabel?.font = .boldSystemFont(ofSize: 18)
+        button.layer.cornerRadius = 15
+        button.titleLabel?.font = .boldSystemFont(ofSize: 24)
         button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchDown)
         return button
     }()
@@ -63,8 +63,8 @@ class ModalViewController: UIViewController {
         button.setTitle("담기", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .systemGreen
-        button.layer.cornerRadius = 8 
-        button.titleLabel?.font = .boldSystemFont(ofSize: 18)
+        button.layer.cornerRadius = 15
+        button.titleLabel?.font = .boldSystemFont(ofSize: 24)
         button.addTarget(self, action: #selector(cartButtonTapped), for: .touchDown)
         return button
     }()
@@ -85,7 +85,7 @@ class ModalViewController: UIViewController {
     }
     
     private func configureUI() {
-        view.backgroundColor = .orange
+        view.backgroundColor = .white
         
         [titleLabel, authorLabel, imageView, priceLabel, contentsLabel, cancelButton, cartButton].forEach {
             view.addSubview($0)

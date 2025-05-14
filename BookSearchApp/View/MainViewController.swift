@@ -7,10 +7,12 @@
 
 import UIKit
 import SnapKit
+import Alamofire
 
-class MainViewController: UIViewController {
+class MainViewController: UIViewController, UISearchBarDelegate {
     
     let data = [1, 2, 3, 4, 5]
+    var bookData: [Book] = []
     
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
@@ -39,6 +41,7 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
+        searchBar.delegate = self
     }
     
     private func configureUI() {
@@ -60,6 +63,65 @@ class MainViewController: UIViewController {
             make.horizontalEdges.equalToSuperview()
         }
         
+    }
+    
+    // 서치바 텍스트 (엔터키 입력시)
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        print("검색어: \(searchBar.text ?? "")")
+        searchBar.resignFirstResponder()
+        fetchBooksFromKakaoAPI()
+    }
+    
+    private func fetchData<T: Decodable>(
+        url: URL,
+        headers: HTTPHeaders,
+        completion: @escaping (Result<T, AFError>) -> Void
+    ) {
+        AF.request(url, headers: headers)
+            .validate()
+            .responseDecodable(of: T.self) { response in
+                completion(response.result)
+            }
+    }
+    
+    func fetchBooksFromKakaoAPI() {
+        guard let filePath = Bundle.main.path(forResource: "Info", ofType: "plist") else {
+              return
+            }
+            let plist = NSDictionary(contentsOfFile: filePath)
+            guard let apiKey = plist?.object(forKey: "KakaoApiKey") as? String else {
+              return
+            }
+        
+        let query = "\(searchBar.text ?? "")"
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        let urlString = "https://dapi.kakao.com/v3/search/book?query=\(encodedQuery)"
+        
+        guard let url = URL(string: urlString) else { return }
+        
+        let headers: HTTPHeaders = [
+            "Authorization": "KakaoAK \(apiKey)"
+        ]
+        
+        fetchData(url: url, headers: headers) { (result: Result<BookResponse, AFError>) in
+            switch result {
+            case .success(let response):
+                print("도서 수: \(response.documents.count)")
+                
+                self.bookData = response.documents
+                
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+                
+                for book in response.documents {
+                    print("책 제목: \(book.title), 저자: \(book.authors.first ?? "저자 없음"), 가격: \(book.price), 책 설명: \(book.contents), 이미지: \(book.thumbnail)")
+                }
+                
+            case .failure(let error):
+                print("에러 발생: \(error.localizedDescription)")
+            }
+        }
     }
     
     private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
@@ -153,7 +215,11 @@ class MainViewController: UIViewController {
 
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return data.count
+        if section == 0 {
+            return data.count
+        } else {
+            return bookData.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -171,12 +237,16 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
                 return collectionView.dequeueReusableCell(withReuseIdentifier: "DefaultCell", for: indexPath)
             }
             
+            let book = bookData[indexPath.item]
+            let title = book.title
+            let author = book.authors.first ?? "저자 없음"
+            let price = book.price
+            
+            cell2.update(title: title, author: author, price: price)
+            
             return cell2
         }
-
-//        let text = "\(indexPath.section)_\(indexPath.item)"
-//        cell.update(text: text)
-
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -209,7 +279,11 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         if indexPath.section == 1 {
             let modalVC = ModalViewController()
             modalVC.modalPresentationStyle = .automatic
+            
+            // 클릭 했을 때 Modal 뷰컨트롤러 클릭된 책의 data를 같이 전달한다 present 하기 전에
+            
             present(modalVC, animated: true, completion: nil)
+            
             
         }
     }

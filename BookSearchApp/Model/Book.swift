@@ -12,9 +12,9 @@ struct BookResponse: Codable {
 }
 
 struct Book: Codable {
-    let title: String?
-    let contents: String?
-    let authors: [String]?
-    let price: Int?
-    let thumbnail: String?
+    let title: String
+    let contents: String
+    let authors: [String]
+    let price: Int
+    let thumbnail: String
 }
