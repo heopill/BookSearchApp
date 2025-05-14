@@ -14,8 +14,11 @@ final class ResultCollectionViewCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "책 제목"
-        label.font = .systemFont(ofSize: 23)
+        label.font = .systemFont(ofSize: 18)
         label.textColor = .black
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
+        label.clipsToBounds = true
         return label
     }()
     
@@ -24,6 +27,10 @@ final class ResultCollectionViewCell: UICollectionViewCell {
         label.text = "작가 이름"
         label.font = .systemFont(ofSize: 12)
         label.textColor = .gray
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
+        label.clipsToBounds = true
+        label.textAlignment = .center
         return label
     }()
     
@@ -32,6 +39,7 @@ final class ResultCollectionViewCell: UICollectionViewCell {
         label.text = "77,777원"
         label.font = .systemFont(ofSize: 15)
         label.textColor = .black
+        label.textAlignment = .right
         return label
     }()
     
@@ -45,40 +53,54 @@ final class ResultCollectionViewCell: UICollectionViewCell {
         configureUI()
     }
     
-//    override func prepareForReuse() {
-//        titleLabel.text = nil
-//        authorsLabel.text = nil
-//        priceLabel.text = nil
-//    }
+    override func prepareForReuse() {
+        titleLabel.text = nil
+        authorsLabel.text = nil
+        priceLabel.text = nil
+    }
     
     private func configureUI() {
         contentView.backgroundColor = .white
         contentView.layer.borderColor = UIColor.black.cgColor
         contentView.layer.borderWidth = 0.4
         
-        [titleLabel, authorsLabel, priceLabel].forEach {
+        [priceLabel, authorsLabel, titleLabel].forEach {
             self.addSubview($0)
-        }
-        
-        titleLabel.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.leading.equalToSuperview().offset(25)
-            
-        }
-        
-        authorsLabel.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.leading.equalTo(titleLabel.snp.trailing).offset(45)
         }
         
         priceLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview().inset(25)
+            make.trailing.equalToSuperview().inset(10)
         }
+        
+        authorsLabel.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.equalTo(titleLabel.snp.trailing).offset(10)
+            make.trailing.equalTo(priceLabel.snp.leading).inset(-10)
+            make.width.equalTo(self.contentView.snp.width).multipliedBy(0.15)
+        }
+        
+        titleLabel.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.equalToSuperview().offset(10)
+            make.trailing.equalTo(authorsLabel.snp.leading).inset(-10).priority(.low)
+            make.width.equalTo(self.contentView.snp.width).multipliedBy(0.55)
+        }
+        
+        
     }
     
-    func update(text: String) {
-        titleLabel.text = text
+    func update(title: String, author: String, price: Int) {
+        titleLabel.text = title
+        authorsLabel.text = author
+        if price >= 1000000 {
+            priceLabel.text = "\(price/10000)만원"
+        } else if price > 0 {
+            priceLabel.text = "\(price)원"
+        } else {
+            priceLabel.text = "구매 불가"
+        }
+        
     }
     
 }
