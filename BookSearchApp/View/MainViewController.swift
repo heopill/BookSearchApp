@@ -19,6 +19,7 @@ class MainViewController: UIViewController, UISearchBarDelegate {
         searchBar.placeholder = "책 이름을 입력하세요"
         searchBar.setImage(UIImage(named: "iconSearchDarkGray"), for: .search, state: .normal)
         searchBar.setImage(UIImage(named: "iconCloseDarkGray"), for: .clear, state: .normal)
+        searchBar.backgroundColor = .white
         return searchBar
     }()
     
@@ -112,10 +113,6 @@ class MainViewController: UIViewController, UISearchBarDelegate {
                 
                 DispatchQueue.main.async {
                     self.collectionView.reloadData()
-                }
-                
-                for book in response.documents {
-                    print("책 제목: \(book.title), 저자: \(book.authors.first ?? "저자 없음"), 가격: \(book.price), 책 설명: \(book.contents), 이미지: \(book.thumbnail)")
                 }
                 
             case .failure(let error):
@@ -277,13 +274,12 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
     // cell 클릭 이벤트
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 1 {
-            let modalVC = ModalViewController()
+            let selectedBook = bookData[indexPath.item]
+            
+            let modalVC = ModalViewController(bookData: selectedBook)
             modalVC.modalPresentationStyle = .automatic
             
-            // 클릭 했을 때 Modal 뷰컨트롤러 클릭된 책의 data를 같이 전달한다 present 하기 전에
-            
             present(modalVC, animated: true, completion: nil)
-            
             
         }
     }
