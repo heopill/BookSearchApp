@@ -98,6 +98,8 @@ class ModalViewController: UIViewController {
     
     @objc private func cancelButtonTapped() {
         print("X 버튼 클릭")
+        
+        // Modal 내리기
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -106,23 +108,29 @@ class ModalViewController: UIViewController {
         
         coredata.createData(title: bookData.title, author: bookData.authors.joined(separator: ", "), price: bookData.price, thumbnail: bookData.thumbnail, contents: bookData.contents, isbn: bookData.isbn)
         
+        // Modal 내리기
         self.dismiss(animated: true, completion: nil)
     }
     
     private func configureUI() {
         view.backgroundColor = .white
 
+        // view에 scrollView 추가
         view.addSubview(scrollView)
+        // scrollView에 innerView 추가
         scrollView.addSubview(innerView)
         
+        // innerView안에 들어갈 요소들 추가
         [titleLabel, authorLabel, imageView, priceLabel, contentsLabel].forEach {
             innerView.addSubview($0)
         }
         
+        // 버튼들은 스크롤 영역에 관계없이 사용하기 위해서 플로팅 형식으로 view에 추가
         [cancelButton, cartButton].forEach {
             view.addSubview($0)
         }
         
+        // scrollView constraints 설정
         scrollView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
             make.bottom.equalTo(cancelButton.snp.top).offset(-20)
