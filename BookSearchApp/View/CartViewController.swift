@@ -7,10 +7,14 @@
 
 import UIKit
 import SnapKit
+import CoreData
 
 class CartViewController: UIViewController {
     
-    let data = [1, 2, 3]
+    var bookData: [Book] = []
+    
+    var coredata = CoreDataManager.shared
+    var container: NSPersistentContainer!
     
     lazy var deleteAllButton: UIButton = {
         let button = UIButton()
@@ -37,15 +41,13 @@ class CartViewController: UIViewController {
         return button
     }()
     
-    private lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createCompositionalLayout())
-        collectionView.register(ResultCollectionViewCell.self, forCellWithReuseIdentifier: ResultCollectionViewCell.identifier)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "DefaultCell")
-        
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        
-        return collectionView
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(CustomCell.self, forCellReuseIdentifier: CustomCell.identifier)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.backgroundColor = .white
+        return tableView
     }()
     
     override func viewDidLoad() {
@@ -54,8 +56,26 @@ class CartViewController: UIViewController {
         configureUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        readData()
+        tableView.reloadData()
+    }
+    
+    private func readData() {
+        bookData = []
+        let book = coredata.readAllData()
+        
+        for data in book {
+            let price = data.price
+            guard let title = data.title,let author = data.author, let thumbnail = data.thumbnail, let contents = data.contents, let isbn = data.isbn else { return }
+            bookData.append(Book(title: title, contents: contents, authors: author.components(separatedBy: ", "), price: Int(price), thumbnail: thumbnail, isbn: isbn))
+        }
+    }
+    
     private func configureUI() {
-        [deleteAllButton, titleLabel, addButton, collectionView].forEach {
+        [deleteAllButton, titleLabel, addButton, tableView].forEach {
             view.addSubview($0)
         }
         
@@ -74,65 +94,84 @@ class CartViewController: UIViewController {
             make.trailing.equalToSuperview().inset(20)
         }
         
-        collectionView.snp.makeConstraints { make in
+        tableView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(10)
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().inset(20)
             make.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
+    // 전체 삭제 버튼
     @objc private func deleteAllButtonTapped() {
         print("전체 삭제 버튼 클릭")
+        coredata.deleteAllData()
+        bookData.removeAll()
+        tableView.reloadData()
     }
     
+    // 추가 버튼
     @objc private func addButtonTapped() {
         print("추가 버튼 클릭")
+        self.tabBarController?.selectedIndex = 0
     }
-    
-    // CollectionView layout 만들기
-    private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
-        let layout = UICollectionViewCompositionalLayout { _, _ in
-            return self.createSectionOneLayout()
-        }
-        return layout
-    }
-    
-    // 섹션 레이아웃 만들기
-    private func createSectionOneLayout() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(60))
-        
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = .init(top: 5, leading: 20, bottom: 0, trailing: 20)
-        
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(70))
-        
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        
-        let section = NSCollectionLayoutSection(group: group)
-        
-        return section
-    }
-    
     
 }
 
-
-extension CartViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return data.count
+extension CartViewController: UITableViewDelegate, UITableViewDataSource {
+    // cell의 높이
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell2 = collectionView.dequeueReusableCell(withReuseIdentifier: ResultCollectionViewCell.identifier, for: indexPath) as? ResultCollectionViewCell else {
-            return collectionView.dequeueReusableCell(withReuseIdentifier: "DefaultCell", for: indexPath)
+    // 투명한 뷰 (border 사이의 간격을 위해)
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }
+    
+    // 섹션간 여백 footer에서 5
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 15
+    }
+    
+    // 섹션당 표시할 데이터는 1개
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    // bookData의 count 만큼 섹션 개수
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return bookData.count
+    }
+    
+    // tabelView cell 설정
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: CustomCell.identifier) as? CustomCell ?? CustomCell()
+        let book = bookData[indexPath.section]
+        let title = book.title
+        let author = book.authors.first ?? "저자 없음"
+        let price = book.price
+        
+        cell.update(title: title, author: author, price: price)
+        return cell
+    }
+    
+    // 왼쪽으로 스와이프 했을 때 데이터 삭제
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] (_, _, completionHandler) in
+            guard let self = self else { return }
+            
+            let book = self.bookData[indexPath.item]
+            self.coredata.deleteData(isbn: book.isbn)
+            self.bookData.remove(at: indexPath.item)
+            tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+            
+            completionHandler(true)
         }
         
-        return cell2
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
     
 }

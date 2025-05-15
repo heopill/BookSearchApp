@@ -10,10 +10,14 @@
 		BBA6DFF02DD2126900918530 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = BBA6DFEF2DD2126900918530 /* SnapKit */; };
 		BBFDBABE2DD34FAE00F1CD33 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = BBFDBABD2DD34FAE00F1CD33 /* Alamofire */; };
 		BBFDBAC12DD34FC800F1CD33 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BBFDBAC02DD34FC800F1CD33 /* RxSwift */; };
+		BBFDBBBA2DD4D61800F1CD33 /* BookData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBFDBBB92DD4D61800F1CD33 /* BookData+CoreDataProperties.swift */; };
+		BBFDBBBB2DD4D61800F1CD33 /* BookData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBFDBBB82DD4D61800F1CD33 /* BookData+CoreDataClass.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		BBA6DFC22DD20B4B00918530 /* BookSearchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookSearchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBFDBBB82DD4D61800F1CD33 /* BookData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BookData+CoreDataClass.swift"; sourceTree = "<group>"; };
+		BBFDBBB92DD4D61800F1CD33 /* BookData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BookData+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -54,6 +58,8 @@
 		BBA6DFB92DD20B4B00918530 = {
 			isa = PBXGroup;
 			children = (
+				BBFDBBB82DD4D61800F1CD33 /* BookData+CoreDataClass.swift */,
+				BBFDBBB92DD4D61800F1CD33 /* BookData+CoreDataProperties.swift */,
 				BBA6DFC42DD20B4B00918530 /* BookSearchApp */,
 				BBA6DFC32DD20B4B00918530 /* Products */,
 			);
@@ -149,6 +155,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBFDBBBA2DD4D61800F1CD33 /* BookData+CoreDataProperties.swift in Sources */,
+				BBFDBBBB2DD4D61800F1CD33 /* BookData+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,6 +172,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U73C5KBSMA;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BookSearchApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -192,6 +201,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U73C5KBSMA;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BookSearchApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

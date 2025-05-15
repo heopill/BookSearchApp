@@ -6,13 +6,33 @@
 //
 
 import UIKit
+import Alamofire
+import CoreData
 
 class ModalViewController: UIViewController {
+    var coredata = CoreDataManager.shared
+    var container: NSPersistentContainer!
     
+    let bookData: Book
+    
+    init(bookData: Book, nibName: String? = nil, bundle:Bundle? = nil) {
+        self.bookData = bookData
+        super.init(nibName: nibName, bundle: bundle) 
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private let scrollView = UIScrollView()
+    private let innerView = UIView()
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "제목"
         label.font = .systemFont(ofSize: 25, weight: .bold)
+        label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     
@@ -68,10 +88,12 @@ class ModalViewController: UIViewController {
         button.addTarget(self, action: #selector(cartButtonTapped), for: .touchDown)
         return button
     }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureUI()
+        updateUI()
     }
     
     @objc private func cancelButtonTapped() {
@@ -81,43 +103,65 @@ class ModalViewController: UIViewController {
     
     @objc private func cartButtonTapped() {
         print("담기 버튼 클릭")
+        
+        coredata.createData(title: bookData.title, author: bookData.authors.joined(separator: ", "), price: bookData.price, thumbnail: bookData.thumbnail, contents: bookData.contents, isbn: bookData.isbn)
+        
         self.dismiss(animated: true, completion: nil)
     }
     
     private func configureUI() {
         view.backgroundColor = .white
+
+        view.addSubview(scrollView)
+        scrollView.addSubview(innerView)
         
-        [titleLabel, authorLabel, imageView, priceLabel, contentsLabel, cancelButton, cartButton].forEach {
+        [titleLabel, authorLabel, imageView, priceLabel, contentsLabel].forEach {
+            innerView.addSubview($0)
+        }
+        
+        [cancelButton, cartButton].forEach {
             view.addSubview($0)
+        }
+        
+        scrollView.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(cancelButton.snp.top).offset(-20)
+        }
+        
+        innerView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalToSuperview().offset(20)
+            make.width.equalToSuperview()
         }
         
         authorLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(titleLabel.snp.bottom).offset(15)
+            make.top.equalTo(titleLabel.snp.bottom).offset(20)
         }
         
         imageView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(authorLabel.snp.bottom).offset(15)
+            make.top.equalTo(authorLabel.snp.bottom).offset(20)
             make.width.equalTo(270)
             make.height.equalTo(400)
         }
         
         priceLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(imageView.snp.bottom).offset(15)
+            make.top.equalTo(imageView.snp.bottom).offset(20)
         }
         
         contentsLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.leading.equalToSuperview().offset(30)
             make.trailing.equalToSuperview().inset(30)
-            make.top.equalTo(priceLabel.snp.bottom).offset(15)
+            make.top.equalTo(priceLabel.snp.bottom).offset(20)
+            make.bottom.equalToSuperview()
         }
         
         cancelButton.snp.makeConstraints { make in
@@ -135,4 +179,19 @@ class ModalViewController: UIViewController {
         }
     }
     
+    func updateUI() {
+        titleLabel.text = bookData.title
+        authorLabel.text = bookData.authors.first
+        priceLabel.text = "\(bookData.price)원"
+        contentsLabel.text = bookData.contents
+        
+        AF.request(bookData.thumbnail).responseData { response in
+            if let data = response.data, let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self.imageView.image = image
+                }
+            }
+        }
+        
+    }
 }
