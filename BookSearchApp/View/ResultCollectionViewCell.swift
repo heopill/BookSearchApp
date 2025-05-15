@@ -53,6 +53,7 @@ final class ResultCollectionViewCell: UICollectionViewCell {
         configureUI()
     }
     
+    // 셀 재사용
     override func prepareForReuse() {
         titleLabel.text = nil
         authorsLabel.text = nil

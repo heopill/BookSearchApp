@@ -73,6 +73,7 @@ class MainViewController: UIViewController, UISearchBarDelegate {
         fetchBooksFromKakaoAPI()
     }
     
+    // AlamoFire를 이용한 기본 통신 구조
     private func fetchData<T: Decodable>(
         url: URL,
         headers: HTTPHeaders,
@@ -86,6 +87,7 @@ class MainViewController: UIViewController, UISearchBarDelegate {
     }
     
     func fetchBooksFromKakaoAPI() {
+        // xcconfig에 숨긴 API키를 사용할 수 있게 가져오는 코드
         guard let filePath = Bundle.main.path(forResource: "Info", ofType: "plist") else {
               return
             }
@@ -94,12 +96,14 @@ class MainViewController: UIViewController, UISearchBarDelegate {
               return
             }
         
+        // 사용자가 searchBar에 입력한 text를 쿼리로 추가
         let query = "\(searchBar.text ?? "")"
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         let urlString = "https://dapi.kakao.com/v3/search/book?query=\(encodedQuery)"
         
         guard let url = URL(string: urlString) else { return }
         
+        // KAKAO REST API 사용시 Header를 추가해줘야 함
         let headers: HTTPHeaders = [
             "Authorization": "KakaoAK \(apiKey)"
         ]

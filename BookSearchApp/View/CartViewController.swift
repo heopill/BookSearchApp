@@ -13,6 +13,7 @@ class CartViewController: UIViewController {
     
     var bookData: [Book] = []
     
+    // 싱글톤 패턴의 coredata를 사용하기 위한 코드 작성
     var coredata = CoreDataManager.shared
     var container: NSPersistentContainer!
     
@@ -56,6 +57,7 @@ class CartViewController: UIViewController {
         configureUI()
     }
     
+    // view가 willAppear 될 때 coreData에서 저장된 bookData를 불러오고 tableView에 표시
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -63,13 +65,17 @@ class CartViewController: UIViewController {
         tableView.reloadData()
     }
     
+    // coreData에서 저장된 책 정보 불러오기
     private func readData() {
+        // bookData를 빈 배열로 초기화
         bookData = []
         let book = coredata.readAllData()
         
         for data in book {
             let price = data.price
             guard let title = data.title,let author = data.author, let thumbnail = data.thumbnail, let contents = data.contents, let isbn = data.isbn else { return }
+            
+            // 불러온 책 정보들을 bookData 배열에 append
             bookData.append(Book(title: title, contents: contents, authors: author.components(separatedBy: ", "), price: Int(price), thumbnail: thumbnail, isbn: isbn))
         }
     }
@@ -105,14 +111,21 @@ class CartViewController: UIViewController {
     // 전체 삭제 버튼
     @objc private func deleteAllButtonTapped() {
         print("전체 삭제 버튼 클릭")
+        // coredata에서 데이터 전체 삭제
         coredata.deleteAllData()
+        
+        // 테이블 뷰의 data로 사용되는 bookData 배열을 빈 배열로 초기화
         bookData.removeAll()
+        
+        // 삭제 후 테이블 뷰 reload
         tableView.reloadData()
     }
     
     // 추가 버튼
     @objc private func addButtonTapped() {
         print("추가 버튼 클릭")
+        
+        // 첫번째 탭으로 이동 하기
         self.tabBarController?.selectedIndex = 0
     }
     
