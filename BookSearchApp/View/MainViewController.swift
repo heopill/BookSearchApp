@@ -13,6 +13,7 @@ class MainViewController: UIViewController, UISearchBarDelegate {
     
     let data = [1, 2, 3, 4, 5]
     var bookData: [Book] = []
+    var recentlyBook: [Book] = []
     
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
@@ -89,12 +90,12 @@ class MainViewController: UIViewController, UISearchBarDelegate {
     func fetchBooksFromKakaoAPI() {
         // xcconfig에 숨긴 API키를 사용할 수 있게 가져오는 코드
         guard let filePath = Bundle.main.path(forResource: "Info", ofType: "plist") else {
-              return
-            }
-            let plist = NSDictionary(contentsOfFile: filePath)
-            guard let apiKey = plist?.object(forKey: "KakaoApiKey") as? String else {
-              return
-            }
+            return
+        }
+        let plist = NSDictionary(contentsOfFile: filePath)
+        guard let apiKey = plist?.object(forKey: "KakaoApiKey") as? String else {
+            return
+        }
         
         // 사용자가 searchBar에 입력한 text를 쿼리로 추가
         let query = "\(searchBar.text ?? "")"
@@ -154,7 +155,10 @@ class MainViewController: UIViewController, UISearchBarDelegate {
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuous
         
-        let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(60))
+        // 헤더의 높이를 조건을 주어서 설정
+        let headerHeight: CGFloat = self.recentlyBook.count == 0 ? 0 : 60
+        
+        let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(headerHeight))
         
         let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
         
@@ -217,7 +221,7 @@ class MainViewController: UIViewController, UISearchBarDelegate {
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
-            return data.count
+            return recentlyBook.count
         } else {
             return bookData.count
         }
@@ -225,14 +229,24 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
+        // section이 0일 때 셀 설정
         if indexPath.section == 0 {
             
             guard let cell1 = collectionView.dequeueReusableCell(withReuseIdentifier: RecentlyCollectionViewCell.identifier, for: indexPath) as? RecentlyCollectionViewCell else {
                 return collectionView.dequeueReusableCell(withReuseIdentifier: "DefaultCell", for: indexPath)
             }
             
+            // 선택된 셀의 데이터인 recentlyBook[indexPath.item]을 book에 담기
+            let book = recentlyBook[indexPath.item]
+
+            // imageUrl 변수에 book.thumbnail의 값 넣기 (String)
+            let imageUrl = book.thumbnail
+            
+            // cell1.imageUpdate 메서드에 매개변수로 imageUrl 을 넣고 이미지 뷰에 이미지 넣기
+            cell1.imageUpdate(imageURL: imageUrl)
+            
             return cell1
-        } else {
+        } else { // section이 0이 아닐 때 셀 설정
             
             guard let cell2 = collectionView.dequeueReusableCell(withReuseIdentifier: ResultCollectionViewCell.identifier, for: indexPath) as? ResultCollectionViewCell else {
                 return collectionView.dequeueReusableCell(withReuseIdentifier: "DefaultCell", for: indexPath)
@@ -260,8 +274,6 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
                 header.configure(with: "최근 본 책")
             } else if indexPath.section == 1 {
                 header.configure(with: "검색 결과")
-            } else {
-                header.configure(with: "Header Section \(indexPath.section)")
             }
             
             return header
@@ -271,14 +283,33 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         
     }
     
+    
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
     }
     
     // cell 클릭 이벤트
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.section == 1 {
+        if indexPath.section == 0 {
+            let selectedBook = recentlyBook[indexPath.item]
+            
+            let modalVC = ModalViewController(bookData: selectedBook)
+            modalVC.modalPresentationStyle = .automatic
+            present(modalVC, animated: true, completion: nil)
+            
+        } else if indexPath.section == 1 {
             let selectedBook = bookData[indexPath.item]
+            
+            // 맨 앞에 추가
+            self.recentlyBook.insert(selectedBook, at: 0)
+            
+            // 최대 10개까지만 유지
+            if recentlyBook.count > 10 {
+                recentlyBook.removeLast()
+            }
+            
+            collectionView.reloadData()
             
             let modalVC = ModalViewController(bookData: selectedBook)
             modalVC.modalPresentationStyle = .automatic
@@ -286,5 +317,6 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
             present(modalVC, animated: true, completion: nil)
             
         }
+
     }
 }
