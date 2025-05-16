@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Alamofire
 
 class RecentlyCollectionViewCell: UICollectionViewCell {
     static let identifier = "RecentlyCollectionViewCell"
@@ -45,7 +46,15 @@ class RecentlyCollectionViewCell: UICollectionViewCell {
         imageView.layer.cornerRadius = 45
     }
     
-    private func imageUpdate() {
+    func imageUpdate(imageURL: String) {
+        let imageUrl = imageURL
         
+        AF.request(imageUrl).responseData { response in
+            if let data = response.data, let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self.imageView.image = image
+                }
+            }
+        }
     }
 }
