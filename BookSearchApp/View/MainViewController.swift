@@ -301,6 +301,11 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         } else if indexPath.section == 1 {
             let selectedBook = bookData[indexPath.item]
             
+            // recentlyBook에 이미 들어있는 경우 중복 방지
+            if let existingIndex = recentlyBook.firstIndex(where: { $0.isbn == selectedBook.isbn }) {
+                recentlyBook.remove(at: existingIndex)
+            }
+            
             // 맨 앞에 추가
             self.recentlyBook.insert(selectedBook, at: 0)
             

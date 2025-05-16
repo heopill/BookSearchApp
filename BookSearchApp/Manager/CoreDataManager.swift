@@ -98,5 +98,19 @@ class CoreDataManager {
         }
         
     }
+    
+    // 중복 검사
+    func isBookExists(isbn: String) -> Bool {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "BookData")
+        request.predicate = NSPredicate(format: "isbn == %@", isbn)
+
+        do {
+            let count = try self.container.viewContext.count(for: request)
+            return count > 0
+        } catch {
+            print("중복 확인 실패: \(error)")
+            return false
+        }
+    }
 }
 

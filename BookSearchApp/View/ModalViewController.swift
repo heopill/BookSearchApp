@@ -106,6 +106,17 @@ class ModalViewController: UIViewController {
     @objc private func cartButtonTapped() {
         print("담기 버튼 클릭")
         
+        // 데이터의 중복 검사
+        if coredata.isBookExists(isbn: bookData.isbn) {
+            
+            // 중복이라면 화면에 alert 표시
+            let alert = UIAlertController(title: "알림", message: "이미 담긴 책입니다.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default))
+            self.present(alert, animated: true)
+            return
+        }
+        
+        // 중복이 아니라면 coredata에 Book Data를 저장
         coredata.createData(title: bookData.title, author: bookData.authors.joined(separator: ", "), price: bookData.price, thumbnail: bookData.thumbnail, contents: bookData.contents, isbn: bookData.isbn)
         
         // Modal 내리기
@@ -202,4 +213,6 @@ class ModalViewController: UIViewController {
         }
         
     }
+    
+    
 }
